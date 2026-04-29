@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
-import 'package:shop_demo/core/utils/extensions.dart';
 import 'package:shop_demo/features/listing/presentation/providers/listing_provider.dart';
 import 'package:shop_demo/features/listing/presentation/widgets/amenity_list.dart';
 import 'package:shop_demo/features/listing/presentation/widgets/host_card.dart';
@@ -12,6 +11,7 @@ import 'package:shop_demo/features/listing/presentation/widgets/rating_display_c
 import 'package:shop_demo/features/listing/presentation/widgets/reservation_card.dart';
 import 'package:shop_demo/features/listing/presentation/widgets/reviews_section.dart';
 import 'package:shop_demo/shared/widgets/error_display.dart';
+import 'package:shop_demo/shared/widgets/responsive_builder.dart';
 import 'package:shop_demo/shared/widgets/skeleton_loader.dart';
 
 class ListingDetailPage extends ConsumerWidget {
@@ -51,10 +51,13 @@ class _ListingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = context.isMobile;
+    final bp = ResponsiveBuilder.breakpointFor(
+      MediaQuery.sizeOf(context).width,
+    );
 
     return Stack(
       children: [
+        // Main scroll area
         CustomScrollView(
           slivers: [
             // Photo banner
@@ -65,17 +68,24 @@ class _ListingContent extends StatelessWidget {
               ),
             ),
 
-            // Content
+            // Content — switches layout based on breakpoint
             SliverToBoxAdapter(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1120),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? AppSpacing.base : AppSpacing.xl,
+                    horizontal: bp == ScreenBreakpoint.mobile
+                        ? AppSpacing.base
+                        : AppSpacing.xl,
                   ),
-                  child: isMobile
-                      ? _MobileLayout(listing: listing)
-                      : _DesktopLayout(listing: listing),
+                  child: switch (bp) {
+                    ScreenBreakpoint.mobile =>
+                      _MobileLayout(listing: listing),
+                    ScreenBreakpoint.tablet =>
+                      _TabletLayout(listing: listing),
+                    ScreenBreakpoint.desktop =>
+                      _DesktopLayout(listing: listing),
+                  },
                 ),
               ),
             ),
@@ -87,7 +97,7 @@ class _ListingContent extends StatelessWidget {
         ),
 
         // Fixed bottom reservation bar on mobile
-        if (isMobile)
+        if (bp == ScreenBreakpoint.mobile)
           Positioned(
             left: 0,
             right: 0,
@@ -98,6 +108,8 @@ class _ListingContent extends StatelessWidget {
     );
   }
 }
+
+// ── Mobile layout: single column, fixed bottom bar ───────────────────
 
 class _MobileLayout extends StatelessWidget {
   final dynamic listing;
@@ -110,68 +122,34 @@ class _MobileLayout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: AppSpacing.lg),
-
-        // Title & location
-        Text(
-          listing.title,
-          style: AppTypography.displayXl.copyWith(color: AppColors.ink),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          listing.location,
-          style: AppTypography.bodyMd.copyWith(color: AppColors.muted),
-        ),
-
+        _TitleSection(listing: listing),
         const SizedBox(height: AppSpacing.lg),
-
-        // Rating card
         if (listing.isGuestFavorite || listing.reviewCount > 0)
           RatingDisplayCard(
             rating: listing.rating,
             reviewCount: listing.reviewCount,
             isGuestFavorite: listing.isGuestFavorite,
           ),
-
         const SizedBox(height: AppSpacing.lg),
         const Divider(color: AppColors.hairlineSoft, height: 1),
         const SizedBox(height: AppSpacing.lg),
-
-        // Host card
         HostCard(host: listing.host),
-
         const SizedBox(height: AppSpacing.lg),
         const Divider(color: AppColors.hairlineSoft, height: 1),
         const SizedBox(height: AppSpacing.lg),
-
-        // Description
-        Text(
-          listing.description,
-          style: AppTypography.bodyMd.copyWith(color: AppColors.body),
-        ),
-
+        _DescriptionSection(listing: listing),
         const SizedBox(height: AppSpacing.xl),
         const Divider(color: AppColors.hairlineSoft, height: 1),
         const SizedBox(height: AppSpacing.xl),
-
-        // Amenities
-        Text(
-          'What this place offers',
-          style: AppTypography.displaySm.copyWith(color: AppColors.ink),
-        ),
-        const SizedBox(height: AppSpacing.base),
-        AmenityList(amenities: listing.amenities),
-
+        _AmenitiesSection(listing: listing),
         const SizedBox(height: AppSpacing.xl),
         const Divider(color: AppColors.hairlineSoft, height: 1),
         const SizedBox(height: AppSpacing.xl),
-
-        // Reviews
         ReviewsSection(
           reviews: listing.reviews,
           rating: listing.rating,
           reviewCount: listing.reviewCount,
         ),
-
         // Extra bottom padding for mobile bottom bar
         const SizedBox(height: 100),
       ],
@@ -179,10 +157,12 @@ class _MobileLayout extends StatelessWidget {
   }
 }
 
-class _DesktopLayout extends StatelessWidget {
+// ── Tablet layout: single column, reservation card inline ────────────
+
+class _TabletLayout extends StatelessWidget {
   final dynamic listing;
 
-  const _DesktopLayout({required this.listing});
+  const _TabletLayout({required this.listing});
 
   @override
   Widget build(BuildContext context) {
@@ -190,37 +170,22 @@ class _DesktopLayout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: AppSpacing.lg),
-
-        // Title & location
-        Text(
-          listing.title,
-          style: AppTypography.displayXl.copyWith(color: AppColors.ink),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          listing.location,
-          style: AppTypography.bodyMd.copyWith(color: AppColors.muted),
-        ),
-
+        _TitleSection(listing: listing),
         const SizedBox(height: AppSpacing.lg),
-
-        // Rating card
         if (listing.isGuestFavorite || listing.reviewCount > 0)
           RatingDisplayCard(
             rating: listing.rating,
             reviewCount: listing.reviewCount,
             isGuestFavorite: listing.isGuestFavorite,
           ),
-
         const SizedBox(height: AppSpacing.lg),
         const Divider(color: AppColors.hairlineSoft, height: 1),
         const SizedBox(height: AppSpacing.lg),
 
-        // Two-column layout: main content + sticky sidebar
+        // Two-column: content + reservation card (not sticky on tablet)
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left: main content
             Expanded(
               flex: 3,
               child: Column(
@@ -230,34 +195,15 @@ class _DesktopLayout extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   const Divider(color: AppColors.hairlineSoft, height: 1),
                   const SizedBox(height: AppSpacing.xl),
-                  Text(
-                    listing.description,
-                    style: AppTypography.bodyMd.copyWith(color: AppColors.body),
-                  ),
+                  _DescriptionSection(listing: listing),
                   const SizedBox(height: AppSpacing.xl),
                   const Divider(color: AppColors.hairlineSoft, height: 1),
                   const SizedBox(height: AppSpacing.xl),
-                  Text(
-                    'What this place offers',
-                    style: AppTypography.displaySm.copyWith(color: AppColors.ink),
-                  ),
-                  const SizedBox(height: AppSpacing.base),
-                  AmenityList(amenities: listing.amenities),
-                  const SizedBox(height: AppSpacing.xl),
-                  const Divider(color: AppColors.hairlineSoft, height: 1),
-                  const SizedBox(height: AppSpacing.xl),
-                  ReviewsSection(
-                    reviews: listing.reviews,
-                    rating: listing.rating,
-                    reviewCount: listing.reviewCount,
-                  ),
+                  _AmenitiesSection(listing: listing),
                 ],
               ),
             ),
-
             const SizedBox(width: AppSpacing.xl),
-
-            // Right: sticky reservation card
             Expanded(
               flex: 2,
               child: Padding(
@@ -272,7 +218,163 @@ class _DesktopLayout extends StatelessWidget {
           ],
         ),
 
+        const SizedBox(height: AppSpacing.xl),
+        const Divider(color: AppColors.hairlineSoft, height: 1),
+        const SizedBox(height: AppSpacing.xl),
+        ReviewsSection(
+          reviews: listing.reviews,
+          rating: listing.rating,
+          reviewCount: listing.reviewCount,
+        ),
         const SizedBox(height: AppSpacing.section),
+      ],
+    );
+  }
+}
+
+// ── Desktop layout: content left, sticky reservation sidebar right ───
+
+class _DesktopLayout extends StatelessWidget {
+  final dynamic listing;
+
+  const _DesktopLayout({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: AppSpacing.lg),
+        _TitleSection(listing: listing),
+        const SizedBox(height: AppSpacing.lg),
+        if (listing.isGuestFavorite || listing.reviewCount > 0)
+          RatingDisplayCard(
+            rating: listing.rating,
+            reviewCount: listing.reviewCount,
+            isGuestFavorite: listing.isGuestFavorite,
+          ),
+        const SizedBox(height: AppSpacing.lg),
+        const Divider(color: AppColors.hairlineSoft, height: 1),
+        const SizedBox(height: AppSpacing.lg),
+
+        // Two-column layout: content + sticky sidebar
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left: main content
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HostCard(host: listing.host),
+                    const SizedBox(height: AppSpacing.xl),
+                    const Divider(color: AppColors.hairlineSoft, height: 1),
+                    const SizedBox(height: AppSpacing.xl),
+                    _DescriptionSection(listing: listing),
+                    const SizedBox(height: AppSpacing.xl),
+                    const Divider(color: AppColors.hairlineSoft, height: 1),
+                    const SizedBox(height: AppSpacing.xl),
+                    _AmenitiesSection(listing: listing),
+                    const SizedBox(height: AppSpacing.xl),
+                    const Divider(color: AppColors.hairlineSoft, height: 1),
+                    const SizedBox(height: AppSpacing.xl),
+                    ReviewsSection(
+                      reviews: listing.reviews,
+                      rating: listing.rating,
+                      reviewCount: listing.reviewCount,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: AppSpacing.xl),
+
+              // Right: sticky reservation card
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.lg),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: ReservationCard(
+                        pricePerNight: listing.pricePerNight,
+                        maxGuests: listing.maxGuests,
+                        listingId: listing.id,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: AppSpacing.section),
+      ],
+    );
+  }
+}
+
+// ── Shared sub-widgets ───────────────────────────────────────────────
+
+class _TitleSection extends StatelessWidget {
+  final dynamic listing;
+
+  const _TitleSection({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          listing.title,
+          style: AppTypography.displayXl.copyWith(color: AppColors.ink),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          listing.location,
+          style: AppTypography.bodyMd.copyWith(color: AppColors.muted),
+        ),
+      ],
+    );
+  }
+}
+
+class _DescriptionSection extends StatelessWidget {
+  final dynamic listing;
+
+  const _DescriptionSection({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      listing.description,
+      style: AppTypography.bodyMd.copyWith(color: AppColors.body),
+    );
+  }
+}
+
+class _AmenitiesSection extends StatelessWidget {
+  final dynamic listing;
+
+  const _AmenitiesSection({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'What this place offers',
+          style: AppTypography.displaySm.copyWith(color: AppColors.ink),
+        ),
+        const SizedBox(height: AppSpacing.base),
+        AmenityList(amenities: listing.amenities),
       ],
     );
   }
@@ -336,7 +438,6 @@ class _MobileBottomBar extends StatelessWidget {
               height: 48,
               child: ElevatedButton(
                 onPressed: () {
-                  // Show reservation sheet
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
