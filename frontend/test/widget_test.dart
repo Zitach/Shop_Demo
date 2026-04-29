@@ -6,6 +6,6 @@ void main() {
   testWidgets('App should render', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: ShopApp()));
     await tester.pumpAndSettle();
-    expect(find.text('Home'), findsWidgets);
+    expect(find.text('Shop Demo'), findsOneWidget);
   });
 }

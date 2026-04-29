@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shop_demo/features/home/presentation/pages/home_page.dart';
 
 class _PlaceholderPage extends StatelessWidget {
   final String title;
@@ -20,7 +21,7 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/',
       name: 'home',
-      builder: (context, state) => const _PlaceholderPage('Home'),
+      builder: (context, state) => const HomePage(),
     ),
     GoRoute(
       path: '/search',
