@@ -39,7 +39,7 @@ class ListingGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
       child: Column(
         children: List.generate(

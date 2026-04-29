@@ -14,29 +14,26 @@ class PhotoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'listing_photo_$listingId',
-      child: PhotoCarousel(
-        imageUrls: imageUrls,
-        aspectRatio: 16 / 9,
-        borderRadius: BorderRadius.zero,
-        overlays: [
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            left: 16,
-            child: _CircleIconButton(
-              icon: Icons.arrow_back,
-              onTap: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go('/');
-                }
-              },
-            ),
+    return PhotoCarousel(
+      imageUrls: imageUrls,
+      aspectRatio: 16 / 9,
+      borderRadius: BorderRadius.zero,
+      overlays: [
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 8,
+          left: 16,
+          child: _CircleIconButton(
+            icon: Icons.arrow_back,
+            onTap: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

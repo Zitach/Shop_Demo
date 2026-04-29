@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_radius.dart';
@@ -47,6 +48,20 @@ class _PhotoCarouselState extends State<PhotoCarousel> {
               itemCount: widget.imageUrls.length,
               onPageChanged: (i) => setState(() => _current = i),
               itemBuilder: (context, index) {
+                if (kIsWeb) {
+                  return Image.network(
+                    widget.imageUrls[index],
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(color: AppColors.surfaceSoft);
+                    },
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: AppColors.surfaceSoft,
+                      child: const Icon(Icons.broken_image, color: AppColors.muted),
+                    ),
+                  );
+                }
                 return CachedNetworkImage(
                   imageUrl: widget.imageUrls[index],
                   fit: BoxFit.cover,

@@ -44,6 +44,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           context.pop();
         }
       });
+    } else {
+      // On desktop, auto-open the search overlay dialog too
+      _showDesktopOverlay(context);
     }
   }
 

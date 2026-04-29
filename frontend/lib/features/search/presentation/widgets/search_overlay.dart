@@ -306,13 +306,13 @@ class _TabButton extends StatelessWidget {
   }
 }
 
-class _WhereTab extends StatelessWidget {
+class _WhereTab extends ConsumerWidget {
   final TextEditingController controller;
 
   const _WhereTab({required this.controller});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.base),
       child: Column(
@@ -323,7 +323,9 @@ class _WhereTab extends StatelessWidget {
             style: AppTypography.displaySm.copyWith(color: AppColors.ink),
           ),
           const SizedBox(height: AppSpacing.base),
-          TextField(
+          Material(
+            color: Colors.transparent,
+            child: TextField(
             controller: controller,
             autofocus: true,
             decoration: InputDecoration(
@@ -343,8 +345,9 @@ class _WhereTab extends StatelessWidget {
             ),
             style: AppTypography.bodyMd.copyWith(color: AppColors.ink),
             onChanged: (value) {
-              // Update filter query on change
+              ref.read(searchFilterProvider.notifier).updateQuery(value.isEmpty ? null : value);
             },
+          ),
           ),
         ],
       ),

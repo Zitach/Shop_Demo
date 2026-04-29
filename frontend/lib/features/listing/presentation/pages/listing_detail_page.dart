@@ -258,59 +258,57 @@ class _DesktopLayout extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
 
         // Two-column layout: content + sticky sidebar
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left: main content
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HostCard(host: listing.host),
-                    const SizedBox(height: AppSpacing.xl),
-                    const Divider(color: AppColors.hairlineSoft, height: 1),
-                    const SizedBox(height: AppSpacing.xl),
-                    _DescriptionSection(listing: listing),
-                    const SizedBox(height: AppSpacing.xl),
-                    const Divider(color: AppColors.hairlineSoft, height: 1),
-                    const SizedBox(height: AppSpacing.xl),
-                    _AmenitiesSection(listing: listing),
-                    const SizedBox(height: AppSpacing.xl),
-                    const Divider(color: AppColors.hairlineSoft, height: 1),
-                    const SizedBox(height: AppSpacing.xl),
-                    ReviewsSection(
-                      reviews: listing.reviews,
-                      rating: listing.rating,
-                      reviewCount: listing.reviewCount,
-                    ),
-                  ],
-                ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Left: main content
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  HostCard(host: listing.host),
+                  const SizedBox(height: AppSpacing.xl),
+                  const Divider(color: AppColors.hairlineSoft, height: 1),
+                  const SizedBox(height: AppSpacing.xl),
+                  _DescriptionSection(listing: listing),
+                  const SizedBox(height: AppSpacing.xl),
+                  const Divider(color: AppColors.hairlineSoft, height: 1),
+                  const SizedBox(height: AppSpacing.xl),
+                  _AmenitiesSection(listing: listing),
+                  const SizedBox(height: AppSpacing.xl),
+                  const Divider(color: AppColors.hairlineSoft, height: 1),
+                  const SizedBox(height: AppSpacing.xl),
+                  ReviewsSection(
+                    reviews: listing.reviews,
+                    rating: listing.rating,
+                    reviewCount: listing.reviewCount,
+                  ),
+                ],
               ),
+            ),
 
-              const SizedBox(width: AppSpacing.xl),
+            const SizedBox(width: AppSpacing.xl),
 
-              // Right: sticky reservation card
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: AppSpacing.lg),
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: ReservationCard(
-                        pricePerNight: listing.pricePerNight,
-                        maxGuests: listing.maxGuests,
-                        listingId: listing.id,
-                      ),
+            // Right: sticky reservation card
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.lg),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ReservationCard(
+                      pricePerNight: listing.pricePerNight,
+                      maxGuests: listing.maxGuests,
+                      listingId: listing.id,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
 
         const SizedBox(height: AppSpacing.section),

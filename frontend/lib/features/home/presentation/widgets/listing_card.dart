@@ -61,36 +61,33 @@ class _ListingCardWidgetState extends ConsumerState<ListingCardWidget>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Hero(
-            tag: 'listing_photo_${l.id}',
-            child: PhotoCarousel(
-              imageUrls: l.imageUrls,
-              aspectRatio: 1.0,
-              overlays: [
-                if (l.isGuestFavorite)
-                  const Positioned(
-                    top: AppSpacing.sm,
-                    left: AppSpacing.sm,
-                    child: GuestFavoriteBadge(),
-                  ),
-                Positioned(
+          PhotoCarousel(
+            imageUrls: l.imageUrls,
+            aspectRatio: 1.0,
+            overlays: [
+              if (l.isGuestFavorite)
+                const Positioned(
                   top: AppSpacing.sm,
-                  right: AppSpacing.sm,
-                  child: GestureDetector(
-                    onTap: _toggleFavorite,
-                    child: ScaleTransition(
-                      scale: _heartController,
-                      child: Icon(
-                        isFavorited ? Icons.favorite : Icons.favorite_border,
-                        color:
-                            isFavorited ? AppColors.primary : Colors.white,
-                        size: 24,
-                      ),
+                  left: AppSpacing.sm,
+                  child: GuestFavoriteBadge(),
+                ),
+              Positioned(
+                top: AppSpacing.sm,
+                right: AppSpacing.sm,
+                child: GestureDetector(
+                  onTap: _toggleFavorite,
+                  child: ScaleTransition(
+                    scale: _heartController,
+                    child: Icon(
+                      isFavorited ? Icons.favorite : Icons.favorite_border,
+                      color:
+                          isFavorited ? AppColors.primary : Colors.white,
+                      size: 24,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.sm),
           Row(

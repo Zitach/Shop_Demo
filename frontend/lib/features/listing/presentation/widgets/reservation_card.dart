@@ -76,7 +76,7 @@ class _ReservationCardState extends State<ReservationCard> {
                 : 'Add dates',
             onTap: _pickDates,
           ),
-          const SizedBox(height: -1),
+          const SizedBox(height: 0),
           _PickerField(
             label: 'CHECKOUT',
             value: _dateRange != null
@@ -84,7 +84,7 @@ class _ReservationCardState extends State<ReservationCard> {
                 : 'Add dates',
             onTap: _pickDates,
           ),
-          const SizedBox(height: -1),
+          const SizedBox(height: 0),
           _GuestPicker(
             guests: _guests,
             maxGuests: widget.maxGuests,
