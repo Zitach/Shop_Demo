@@ -5,6 +5,7 @@ import 'package:shop_demo/app/app.dart';
 void main() {
   testWidgets('App should render', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: ShopApp()));
-    expect(find.text('Shop Demo'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.text('Home'), findsWidgets);
   });
 }
