@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/core/utils/formatters.dart';
 import 'package:shop_demo/features/home/domain/listing_card.dart';
+import 'package:shop_demo/features/profile/presentation/providers/profile_provider.dart';
 import 'package:shop_demo/shared/widgets/photo_carousel.dart';
 import 'guest_favorite_badge.dart';
 
-class ListingCardWidget extends StatefulWidget {
+class ListingCardWidget extends ConsumerStatefulWidget {
   final ListingCard listing;
   final VoidCallback? onTap;
 
@@ -18,12 +20,11 @@ class ListingCardWidget extends StatefulWidget {
   });
 
   @override
-  State<ListingCardWidget> createState() => _ListingCardWidgetState();
+  ConsumerState<ListingCardWidget> createState() => _ListingCardWidgetState();
 }
 
-class _ListingCardWidgetState extends State<ListingCardWidget>
+class _ListingCardWidgetState extends ConsumerState<ListingCardWidget>
     with SingleTickerProviderStateMixin {
-  bool _isFavorited = false;
   late final AnimationController _heartController;
 
   @override
@@ -44,17 +45,16 @@ class _ListingCardWidgetState extends State<ListingCardWidget>
   }
 
   void _toggleFavorite() {
-    setState(() => _isFavorited = !_isFavorited);
-    if (_isFavorited) {
-      _heartController.forward();
-    } else {
-      _heartController.reverse();
-    }
+    ref.read(favoriteIdsProvider.notifier).toggle(widget.listing.id);
+    _heartController.forward().then((_) => _heartController.reverse());
   }
 
   @override
   Widget build(BuildContext context) {
     final l = widget.listing;
+    final favoriteIds = ref.watch(favoriteIdsProvider);
+    final isFavorited =
+        favoriteIds.valueOrNull?.contains(l.id) ?? false;
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -81,8 +81,9 @@ class _ListingCardWidgetState extends State<ListingCardWidget>
                     child: ScaleTransition(
                       scale: _heartController,
                       child: Icon(
-                        _isFavorited ? Icons.favorite : Icons.favorite_border,
-                        color: _isFavorited ? AppColors.primary : Colors.white,
+                        isFavorited ? Icons.favorite : Icons.favorite_border,
+                        color:
+                            isFavorited ? AppColors.primary : Colors.white,
                         size: 24,
                       ),
                     ),
@@ -97,7 +98,8 @@ class _ListingCardWidgetState extends State<ListingCardWidget>
               Expanded(
                 child: Text(
                   l.title,
-                  style: AppTypography.titleMd.copyWith(color: AppColors.ink),
+                  style:
+                      AppTypography.titleMd.copyWith(color: AppColors.ink),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -107,7 +109,8 @@ class _ListingCardWidgetState extends State<ListingCardWidget>
                 const SizedBox(width: 2),
                 Text(
                   l.rating!.toStringAsFixed(2),
-                  style: AppTypography.bodySm.copyWith(color: AppColors.ink),
+                  style:
+                      AppTypography.bodySm.copyWith(color: AppColors.ink),
                 ),
               ],
             ],
@@ -132,7 +135,8 @@ class _ListingCardWidgetState extends State<ListingCardWidget>
               children: [
                 TextSpan(
                   text: PriceFormatter.perNight(l.pricePerNight),
-                  style: AppTypography.titleMd.copyWith(color: AppColors.ink),
+                  style: AppTypography.titleMd
+                      .copyWith(color: AppColors.ink),
                 ),
               ],
             ),
