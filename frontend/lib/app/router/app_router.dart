@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:shop_demo/app/widgets/nav_shell.dart';
 import 'package:shop_demo/features/auth/presentation/pages/login_page.dart';
 import 'package:shop_demo/features/auth/presentation/pages/register_page.dart';
 import 'package:shop_demo/features/booking/domain/entities/booking.dart';
@@ -15,21 +16,66 @@ import 'package:shop_demo/features/search/presentation/pages/search_results_page
 final goRouter = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      name: 'home',
-      builder: (context, state) => const HomePage(),
+    // Shell routes with bottom/top navigation
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return NavShell(navigationShell: navigationShell);
+      },
+      branches: [
+        // Home
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/',
+              name: 'home',
+              builder: (context, state) => const HomePage(),
+            ),
+          ],
+        ),
+
+        // Search
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/search',
+              name: 'search',
+              builder: (context, state) => const SearchPage(),
+              routes: [
+                GoRoute(
+                  path: 'results',
+                  name: 'searchResults',
+                  builder: (context, state) => const SearchResultsPage(),
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        // Favorites
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/favorites',
+              name: 'favorites',
+              builder: (context, state) => const FavoritesPage(),
+            ),
+          ],
+        ),
+
+        // Profile
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              name: 'profile',
+              builder: (context, state) => const ProfilePage(),
+            ),
+          ],
+        ),
+      ],
     ),
-    GoRoute(
-      path: '/search',
-      name: 'search',
-      builder: (context, state) => const SearchPage(),
-    ),
-    GoRoute(
-      path: '/search/results',
-      name: 'searchResults',
-      builder: (context, state) => const SearchResultsPage(),
-    ),
+
+    // Top-level routes (outside navigation shell)
     GoRoute(
       path: '/listing/:id',
       name: 'listing',
@@ -55,6 +101,11 @@ final goRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: '/my-bookings',
+      name: 'myBookings',
+      builder: (context, state) => const MyBookingsPage(),
+    ),
+    GoRoute(
       path: '/login',
       name: 'login',
       builder: (context, state) => const LoginPage(),
@@ -63,21 +114,6 @@ final goRouter = GoRouter(
       path: '/register',
       name: 'register',
       builder: (context, state) => const RegisterPage(),
-    ),
-    GoRoute(
-      path: '/profile',
-      name: 'profile',
-      builder: (context, state) => const ProfilePage(),
-    ),
-    GoRoute(
-      path: '/my-bookings',
-      name: 'myBookings',
-      builder: (context, state) => const MyBookingsPage(),
-    ),
-    GoRoute(
-      path: '/favorites',
-      name: 'favorites',
-      builder: (context, state) => const FavoritesPage(),
     ),
   ],
 );
