@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shop_demo/core/providers/core_providers.dart';
 import 'package:shop_demo/features/home/domain/listing_card.dart';
 import 'package:shop_demo/features/search/data/search_repository.dart';
 import 'package:shop_demo/features/search/domain/search_filter.dart';
 
 final searchRepositoryProvider = Provider<SearchRepository>((ref) {
-  return SearchRepository();
+  final apiClient = ref.watch(apiClientProvider);
+  return SearchRepository(apiClient);
 });
 
 class SearchFilterNotifier extends StateNotifier<SearchFilter> {
