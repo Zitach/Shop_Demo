@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shop_demo/features/home/presentation/pages/home_page.dart';
+import 'package:shop_demo/features/listing/presentation/pages/listing_detail_page.dart';
+import 'package:shop_demo/features/search/presentation/pages/search_page.dart';
+import 'package:shop_demo/features/search/presentation/pages/search_results_page.dart';
 
 class _PlaceholderPage extends StatelessWidget {
   final String title;
@@ -26,14 +29,19 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/search',
       name: 'search',
-      builder: (context, state) => const _PlaceholderPage('Search'),
+      builder: (context, state) => const SearchPage(),
+    ),
+    GoRoute(
+      path: '/search/results',
+      name: 'searchResults',
+      builder: (context, state) => const SearchResultsPage(),
     ),
     GoRoute(
       path: '/listing/:id',
       name: 'listing',
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return _PlaceholderPage('Listing $id');
+        return ListingDetailPage(listingId: id);
       },
     ),
     GoRoute(
