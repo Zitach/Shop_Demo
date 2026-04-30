@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shop_demo/app/widgets/nav_shell.dart';
 import 'package:shop_demo/features/auth/presentation/pages/login_page.dart';
@@ -12,6 +13,68 @@ import 'package:shop_demo/features/profile/presentation/pages/my_bookings_page.d
 import 'package:shop_demo/features/profile/presentation/pages/profile_page.dart';
 import 'package:shop_demo/features/search/presentation/pages/search_page.dart';
 import 'package:shop_demo/features/search/presentation/pages/search_results_page.dart';
+
+// Shared transition durations
+const _kPageTransitionDuration = Duration(milliseconds: 300);
+const _kPageReverseDuration = Duration(milliseconds: 250);
+
+// Fade + slight upward slide transition (for detail pages)
+CustomTransitionPage<void> _fadeSlideTransition(
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: _kPageTransitionDuration,
+    reverseTransitionDuration: _kPageReverseDuration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      );
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.03),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+// Slide from right transition (for push pages like booking, login)
+CustomTransitionPage<void> _slideRightTransition(
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: _kPageTransitionDuration,
+    reverseTransitionDuration: _kPageReverseDuration,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      );
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0.3, 0),
+          end: Offset.zero,
+        ).animate(curved),
+        child: FadeTransition(
+          opacity: curved,
+          child: child,
+        ),
+      );
+    },
+  );
+}
 
 final goRouter = GoRouter(
   initialLocation: '/',
@@ -79,41 +142,45 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/listing/:id',
       name: 'listing',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id']!;
-        return ListingDetailPage(listingId: id);
+        return _fadeSlideTransition(state, ListingDetailPage(listingId: id));
       },
     ),
     GoRoute(
       path: '/booking/:listingId',
       name: 'booking',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['listingId']!;
-        return BookingPage(listingId: id);
+        return _slideRightTransition(state, BookingPage(listingId: id));
       },
     ),
     GoRoute(
       path: '/booking/confirmation',
       name: 'bookingConfirmation',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final booking = state.extra as Booking;
-        return BookingConfirmationPage(booking: booking);
+        return _slideRightTransition(
+            state, BookingConfirmationPage(booking: booking));
       },
     ),
     GoRoute(
       path: '/my-bookings',
       name: 'myBookings',
-      builder: (context, state) => const MyBookingsPage(),
+      pageBuilder: (context, state) =>
+          _slideRightTransition(state, const MyBookingsPage()),
     ),
     GoRoute(
       path: '/login',
       name: 'login',
-      builder: (context, state) => const LoginPage(),
+      pageBuilder: (context, state) =>
+          _slideRightTransition(state, const LoginPage()),
     ),
     GoRoute(
       path: '/register',
       name: 'register',
-      builder: (context, state) => const RegisterPage(),
+      pageBuilder: (context, state) =>
+          _slideRightTransition(state, const RegisterPage()),
     ),
   ],
 );

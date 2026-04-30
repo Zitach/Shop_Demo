@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 
 /// Bottom navigation bar shown on mobile (<744px) and tablet (<1128px).
 /// Uses GoRouter's StatefulNavigationShell for branch-aware navigation.
@@ -13,6 +14,7 @@ class BottomNavShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: Container(
@@ -28,28 +30,28 @@ class BottomNavShell extends StatelessWidget {
                 _NavItem(
                   icon: Icons.home_outlined,
                   activeIcon: Icons.home,
-                  label: 'Home',
+                  label: l10n.navHome,
                   isActive: navigationShell.currentIndex == 0,
                   onTap: () => _onTap(context, 0),
                 ),
                 _NavItem(
                   icon: Icons.search,
                   activeIcon: Icons.search,
-                  label: 'Search',
+                  label: l10n.navSearch,
                   isActive: navigationShell.currentIndex == 1,
                   onTap: () => _onTap(context, 1),
                 ),
                 _NavItem(
                   icon: Icons.favorite_outline,
                   activeIcon: Icons.favorite,
-                  label: 'Favorites',
+                  label: l10n.navFavorites,
                   isActive: navigationShell.currentIndex == 2,
                   onTap: () => _onTap(context, 2),
                 ),
                 _NavItem(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person,
-                  label: 'Profile',
+                  label: l10n.navProfile,
                   isActive: navigationShell.currentIndex == 3,
                   onTap: () => _onTap(context, 3),
                 ),
@@ -95,15 +97,24 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              size: 24,
-              color: color,
+            AnimatedScale(
+              scale: isActive ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              child: Icon(
+                isActive ? activeIcon : icon,
+                size: 24,
+                color: color,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
-              label,
-              style: AppTypography.captionSm.copyWith(color: color),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: AppTypography.captionSm.copyWith(
+                color: color,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              ),
+              child: Text(label),
             ),
           ],
         ),

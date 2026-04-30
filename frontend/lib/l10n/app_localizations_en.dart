@@ -296,4 +296,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get perNightShort => '/night';
+
+  @override
+  String get showLess => 'Show less';
+
+  @override
+  String get noChargeYet => 'You won\'t be charged yet';
+
+  @override
+  String get listingNotFound => 'Listing not found';
 }

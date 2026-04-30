@@ -90,5 +90,8 @@
   "done": "完成",
   "seeAll": "查看全部",
   "night": "晚",
-  "perNightShort": "/晚"
+  "perNightShort": "/晚",
+  "showLess": "收起",
+  "noChargeYet": "暂时不会扣费",
+  "listingNotFound": "未找到房源"
 }

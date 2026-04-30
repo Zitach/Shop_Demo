@@ -6,7 +6,9 @@ import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/features/home/presentation/widgets/listing_card.dart';
 import 'package:shop_demo/features/profile/presentation/providers/profile_provider.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 import 'package:shop_demo/shared/widgets/error_display.dart';
+import 'package:shop_demo/shared/widgets/skeleton_loader.dart';
 
 class FavoritesPage extends ConsumerWidget {
   const FavoritesPage({super.key});
@@ -17,7 +19,7 @@ class FavoritesPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: Text(AppLocalizations.of(context)!.favorites),
       ),
       body: favoritesAsync.when(
         data: (listings) {
@@ -67,7 +69,7 @@ class FavoritesPage extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ListingGridSkeleton(),
         error: (_, __) => ErrorDisplay(
           message: 'Failed to load favorites',
           onRetry: () => ref.invalidate(favoriteListingsProvider),

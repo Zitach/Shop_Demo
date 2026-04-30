@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
+import 'package:shop_demo/features/listing/domain/listing_detail.dart';
 import 'package:shop_demo/features/listing/presentation/providers/listing_provider.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 import 'package:shop_demo/features/listing/presentation/widgets/amenity_list.dart';
 import 'package:shop_demo/features/listing/presentation/widgets/host_card.dart';
 import 'package:shop_demo/features/listing/presentation/widgets/photo_banner.dart';
@@ -28,7 +30,7 @@ class ListingDetailPage extends ConsumerWidget {
         data: (listing) {
           if (listing == null) {
             return ErrorDisplay(
-              message: 'Listing not found',
+              message: AppLocalizations.of(context)!.listingNotFound,
               onRetry: () => ref.invalidate(listingDetailProvider(listingId)),
             );
           }
@@ -36,7 +38,7 @@ class ListingDetailPage extends ConsumerWidget {
         },
         loading: () => const _ListingDetailSkeleton(),
         error: (e, _) => ErrorDisplay(
-          message: 'Something went wrong',
+          message: AppLocalizations.of(context)!.error,
           onRetry: () => ref.invalidate(listingDetailProvider(listingId)),
         ),
       ),
@@ -45,7 +47,7 @@ class ListingDetailPage extends ConsumerWidget {
 }
 
 class _ListingContent extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _ListingContent({required this.listing});
 
@@ -112,7 +114,7 @@ class _ListingContent extends StatelessWidget {
 // ── Mobile layout: single column, fixed bottom bar ───────────────────
 
 class _MobileLayout extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _MobileLayout({required this.listing});
 
@@ -160,7 +162,7 @@ class _MobileLayout extends StatelessWidget {
 // ── Tablet layout: single column, reservation card inline ────────────
 
 class _TabletLayout extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _TabletLayout({required this.listing});
 
@@ -235,9 +237,11 @@ class _TabletLayout extends StatelessWidget {
 // ── Desktop layout: content left, sticky reservation sidebar right ───
 
 class _DesktopLayout extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _DesktopLayout({required this.listing});
+
+  static const _sidebarWidth = 380.0;
 
   @override
   Widget build(BuildContext context) {
@@ -257,13 +261,12 @@ class _DesktopLayout extends StatelessWidget {
         const Divider(color: AppColors.hairlineSoft, height: 1),
         const SizedBox(height: AppSpacing.lg),
 
-        // Two-column layout: content + sticky sidebar
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        // Two-column layout: scrollable content + sticky sidebar
+        Stack(
           children: [
-            // Left: main content
-            Expanded(
-              flex: 3,
+            // Left: main content (with right padding for sidebar)
+            Padding(
+              padding: const EdgeInsets.only(right: _sidebarWidth + AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -288,22 +291,19 @@ class _DesktopLayout extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(width: AppSpacing.xl),
-
             // Right: sticky reservation card
-            Expanded(
-              flex: 2,
+            Positioned(
+              right: 0,
+              top: 0,
+              width: _sidebarWidth,
               child: Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.lg),
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: ReservationCard(
-                      pricePerNight: listing.pricePerNight,
-                      maxGuests: listing.maxGuests,
-                      listingId: listing.id,
-                    ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: ReservationCard(
+                    pricePerNight: listing.pricePerNight,
+                    maxGuests: listing.maxGuests,
+                    listingId: listing.id,
                   ),
                 ),
               ),
@@ -320,7 +320,7 @@ class _DesktopLayout extends StatelessWidget {
 // ── Shared sub-widgets ───────────────────────────────────────────────
 
 class _TitleSection extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _TitleSection({required this.listing});
 
@@ -343,22 +343,47 @@ class _TitleSection extends StatelessWidget {
   }
 }
 
-class _DescriptionSection extends StatelessWidget {
-  final dynamic listing;
+class _DescriptionSection extends StatefulWidget {
+  final ListingDetail listing;
 
   const _DescriptionSection({required this.listing});
 
   @override
+  State<_DescriptionSection> createState() => _DescriptionSectionState();
+}
+
+class _DescriptionSectionState extends State<_DescriptionSection> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Text(
-      listing.description,
-      style: AppTypography.bodyMd.copyWith(color: AppColors.body),
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.listing.description,
+          style: AppTypography.bodyMd.copyWith(color: AppColors.body),
+          maxLines: _expanded ? null : 3,
+          overflow: _expanded ? null : TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        GestureDetector(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Text(
+            _expanded ? l10n.showLess : l10n.showMore,
+            style: AppTypography.titleSm.copyWith(
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
 class _AmenitiesSection extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _AmenitiesSection({required this.listing});
 
@@ -368,7 +393,7 @@ class _AmenitiesSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'What this place offers',
+          AppLocalizations.of(context)!.whatThisPlaceOffers,
           style: AppTypography.displaySm.copyWith(color: AppColors.ink),
         ),
         const SizedBox(height: AppSpacing.base),
@@ -379,7 +404,7 @@ class _AmenitiesSection extends StatelessWidget {
 }
 
 class _MobileBottomBar extends StatelessWidget {
-  final dynamic listing;
+  final ListingDetail listing;
 
   const _MobileBottomBar({required this.listing});
 
@@ -470,7 +495,7 @@ class _MobileBottomBar extends StatelessWidget {
                   ),
                   textStyle: AppTypography.buttonMd,
                 ),
-                child: const Text('Reserve'),
+                child: Text(AppLocalizations.of(context)!.reserve),
               ),
             ),
           ],

@@ -643,6 +643,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'/night'**
   String get perNightShort;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
+
+  /// No description provided for @noChargeYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t be charged yet'**
+  String get noChargeYet;
+
+  /// No description provided for @listingNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing not found'**
+  String get listingNotFound;
 }
 
 class _AppLocalizationsDelegate

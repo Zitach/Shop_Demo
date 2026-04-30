@@ -4,6 +4,7 @@ import 'package:shop_demo/app/theme/app_radius.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/core/utils/formatters.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 import 'package:shop_demo/shared/widgets/app_button.dart';
 
 class ReservationCard extends StatefulWidget {
@@ -38,6 +39,7 @@ class _ReservationCardState extends State<ReservationCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.canvas,
@@ -70,18 +72,18 @@ class _ReservationCardState extends State<ReservationCard> {
 
           // Date picker
           _PickerField(
-            label: 'CHECK-IN',
+            label: l10n.checkIn.toUpperCase(),
             value: _dateRange != null
                 ? DateFmt.monthDay(_dateRange!.start)
-                : 'Add dates',
+                : l10n.addDates,
             onTap: _pickDates,
           ),
           const SizedBox(height: 0),
           _PickerField(
-            label: 'CHECKOUT',
+            label: l10n.checkOut.toUpperCase(),
             value: _dateRange != null
                 ? DateFmt.monthDay(_dateRange!.end)
-                : 'Add dates',
+                : l10n.addDates,
             onTap: _pickDates,
           ),
           const SizedBox(height: 0),
@@ -93,7 +95,7 @@ class _ReservationCardState extends State<ReservationCard> {
 
           const SizedBox(height: AppSpacing.base),
           AppButton.primary(
-            label: 'Reserve',
+            label: l10n.reserve,
             onTap: _nights > 0
                 ? () {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -105,43 +107,49 @@ class _ReservationCardState extends State<ReservationCard> {
                 : null,
           ),
 
-          if (_nights > 0) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Center(
-              child: Text(
-                'You won\'t be charged yet',
-                style: AppTypography.bodySm.copyWith(color: AppColors.muted),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.base),
-            const Divider(color: AppColors.hairlineSoft, height: 1),
-            const SizedBox(height: AppSpacing.base),
-
-            // Fee breakdown
-            _FeeRow(
-              label:
-                  '${PriceFormatter.format(widget.pricePerNight)} x $_nights nights',
-              value: PriceFormatter.formatDecimal(_subtotal),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            _FeeRow(
-              label: 'Cleaning fee',
-              value: PriceFormatter.formatDecimal(_cleaningFee),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            _FeeRow(
-              label: 'Service fee',
-              value: PriceFormatter.formatDecimal(_serviceFee),
-            ),
-            const SizedBox(height: AppSpacing.base),
-            const Divider(color: AppColors.hairlineSoft, height: 1),
-            const SizedBox(height: AppSpacing.base),
-            _FeeRow(
-              label: 'Total',
-              value: PriceFormatter.formatDecimal(_total),
-              bold: true,
-            ),
-          ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutCubic,
+            child: _nights > 0
+                ? Column(
+                    children: [
+                      const SizedBox(height: AppSpacing.sm),
+                      Center(
+                        child: Text(
+                          l10n.noChargeYet,
+                          style: AppTypography.bodySm.copyWith(color: AppColors.muted),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.base),
+                      const Divider(color: AppColors.hairlineSoft, height: 1),
+                      const SizedBox(height: AppSpacing.base),
+                      _FeeRow(
+                        label:
+                            '${PriceFormatter.format(widget.pricePerNight)} x $_nights nights',
+                        value: PriceFormatter.formatDecimal(_subtotal),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _FeeRow(
+                        label: l10n.cleaningFee,
+                        value: PriceFormatter.formatDecimal(_cleaningFee),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _FeeRow(
+                        label: l10n.serviceFee,
+                        value: PriceFormatter.formatDecimal(_serviceFee),
+                      ),
+                      const SizedBox(height: AppSpacing.base),
+                      const Divider(color: AppColors.hairlineSoft, height: 1),
+                      const SizedBox(height: AppSpacing.base),
+                      _FeeRow(
+                        label: l10n.total,
+                        value: PriceFormatter.formatDecimal(_total),
+                        bold: true,
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -227,6 +235,7 @@ class _GuestPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.base,
@@ -243,7 +252,7 @@ class _GuestPicker extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'GUESTS',
+                  l10n.guests.toUpperCase(),
                   style: AppTypography.uppercaseTag.copyWith(color: AppColors.ink),
                 ),
                 const SizedBox(height: 2),

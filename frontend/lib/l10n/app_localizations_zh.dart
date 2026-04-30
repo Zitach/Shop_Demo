@@ -296,4 +296,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get perNightShort => '/晚';
+
+  @override
+  String get showLess => '收起';
+
+  @override
+  String get noChargeYet => '暂时不会扣费';
+
+  @override
+  String get listingNotFound => '未找到房源';
 }

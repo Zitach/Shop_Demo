@@ -11,17 +11,59 @@ import 'package:shop_demo/features/home/presentation/widgets/search_bar_pill.dar
 import 'package:shop_demo/l10n/app_localizations.dart';
 import 'package:shop_demo/shared/widgets/error_display.dart';
 import 'package:shop_demo/shared/widgets/skeleton_loader.dart';
+import 'package:shop_demo/shared/widgets/staggered_grid_item.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  final _scrollController = ScrollController();
+  bool _showScrollToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final show = _scrollController.offset > 500;
+    if (show != _showScrollToTop) {
+      setState(() => _showScrollToTop = show);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final categories = ref.watch(categoriesProvider);
     final listings = ref.watch(featuredListingsProvider);
 
     return Scaffold(
+      floatingActionButton: _showScrollToTop
+          ? FloatingActionButton.small(
+              onPressed: () => _scrollController.animateTo(
+                0,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOutCubic,
+              ),
+              backgroundColor: AppColors.canvas,
+              foregroundColor: AppColors.ink,
+              elevation: 2,
+              child: const Icon(Icons.keyboard_arrow_up),
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(categoriesProvider);
@@ -32,6 +74,7 @@ class HomePage extends ConsumerWidget {
           ]);
         },
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -68,10 +111,7 @@ class HomePage extends ConsumerWidget {
             SliverToBoxAdapter(
               child: categories.when(
                 data: (cats) => CategoryStrip(categories: cats),
-                loading: () => const SizedBox(
-                  height: 72,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
+                loading: () => const CategoryStripSkeleton(),
                 error: (e, _) => SizedBox(
                   height: 72,
                   child: Center(child: Text(l10n.error)),
@@ -111,9 +151,12 @@ class HomePage extends ConsumerWidget {
                             right: AppSpacing.base,
                             bottom: AppSpacing.lg,
                           ),
-                          child: ListingCardWidget(
-                            listing: items[index],
-                            onTap: () => context.push('/listing/${items[index].id}'),
+                          child: StaggeredGridItem(
+                            index: index,
+                            child: ListingCardWidget(
+                              listing: items[index],
+                              onTap: () => context.push('/listing/${items[index].id}'),
+                            ),
                           ),
                         ),
                         childCount: items.length,
@@ -129,9 +172,12 @@ class HomePage extends ConsumerWidget {
                       childAspectRatio: 0.75,
                     ),
                     delegate: SliverChildBuilderDelegate(
-                      (context, index) => ListingCardWidget(
-                        listing: items[index],
-                        onTap: () => context.push('/listing/${items[index].id}'),
+                      (context, index) => StaggeredGridItem(
+                        index: index,
+                        child: ListingCardWidget(
+                          listing: items[index],
+                          onTap: () => context.push('/listing/${items[index].id}'),
+                        ),
                       ),
                       childCount: items.length,
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 
 class RatingDisplayCard extends StatelessWidget {
   final double rating;
@@ -17,6 +18,7 @@ class RatingDisplayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -34,12 +36,12 @@ class RatingDisplayCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Guest favorite',
+                  l10n.guestFavorite,
                   style: AppTypography.titleMd.copyWith(color: AppColors.ink),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'One of the most loved homes on Airbnb',
+                  l10n.guestFavoriteSubtitle,
                   style: AppTypography.bodySm.copyWith(color: AppColors.muted),
                 ),
               ],
@@ -76,7 +78,7 @@ class RatingDisplayCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                '$reviewCount reviews',
+                l10n.reviewsTitle(reviewCount),
                 style: AppTypography.bodySm.copyWith(
                   color: AppColors.muted,
                   decoration: TextDecoration.underline,

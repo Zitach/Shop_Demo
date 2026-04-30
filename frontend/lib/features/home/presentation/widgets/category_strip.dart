@@ -6,7 +6,7 @@ import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/features/home/domain/category.dart';
 import 'package:shop_demo/l10n/app_localizations.dart';
 
-class CategoryStrip extends StatelessWidget {
+class CategoryStrip extends StatefulWidget {
   final List<Category> categories;
   final int? selectedId;
   final ValueChanged<Category>? onSelected;
@@ -19,23 +19,101 @@ class CategoryStrip extends StatelessWidget {
   });
 
   @override
+  State<CategoryStrip> createState() => _CategoryStripState();
+}
+
+class _CategoryStripState extends State<CategoryStrip> {
+  final _scrollController = ScrollController();
+  bool _showLeftFade = false;
+  bool _showRightFade = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final offset = _scrollController.offset;
+    final maxOffset = _scrollController.position.maxScrollExtent;
+    setState(() {
+      _showLeftFade = offset > 0;
+      _showRightFade = offset < maxOffset - 1;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 72,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.lg),
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          final isSelected = cat.id == selectedId;
-          return _CategoryItem(
-            category: cat,
-            isSelected: isSelected,
-            onTap: () => onSelected?.call(cat),
-          );
-        },
+      child: Stack(
+        children: [
+          ListView.separated(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
+            itemCount: widget.categories.length,
+            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.lg),
+            itemBuilder: (context, index) {
+              final cat = widget.categories[index];
+              final isSelected = cat.id == widget.selectedId;
+              return _CategoryItem(
+                category: cat,
+                isSelected: isSelected,
+                onTap: () => widget.onSelected?.call(cat),
+              );
+            },
+          ),
+
+          // Left fade
+          if (_showLeftFade)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 40,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppColors.canvas,
+                      AppColors.canvas.withValues(alpha: 0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+          // Right fade
+          if (_showRightFade)
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: 40,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    colors: [
+                      AppColors.canvas,
+                      AppColors.canvas.withValues(alpha: 0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

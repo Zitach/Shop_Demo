@@ -98,5 +98,8 @@
   "done": "Done",
   "seeAll": "See all",
   "night": "night",
-  "perNightShort": "/night"
+  "perNightShort": "/night",
+  "showLess": "Show less",
+  "noChargeYet": "You won't be charged yet",
+  "listingNotFound": "Listing not found"
 }

@@ -7,7 +7,9 @@ import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/core/utils/formatters.dart';
 import 'package:shop_demo/features/booking/domain/entities/booking.dart';
 import 'package:shop_demo/features/booking/presentation/providers/booking_provider.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 import 'package:shop_demo/shared/widgets/error_display.dart';
+import 'package:shop_demo/shared/widgets/skeleton_loader.dart';
 
 class MyBookingsPage extends ConsumerWidget {
   const MyBookingsPage({super.key});
@@ -18,7 +20,7 @@ class MyBookingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Bookings'),
+        title: Text(AppLocalizations.of(context)!.myBookings),
       ),
       body: bookingsAsync.when(
         data: (bookings) {
@@ -59,7 +61,7 @@ class MyBookingsPage extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const BookingListSkeleton(),
         error: (_, __) => ErrorDisplay(
           message: 'Failed to load bookings',
           onRetry: () => ref.invalidate(myBookingsProvider),
@@ -69,19 +71,43 @@ class MyBookingsPage extends ConsumerWidget {
   }
 }
 
-class _BookingCard extends StatelessWidget {
+class _BookingCard extends StatefulWidget {
   final Booking booking;
 
   const _BookingCard({required this.booking});
 
   @override
+  State<_BookingCard> createState() => _BookingCardState();
+}
+
+class _BookingCardState extends State<_BookingCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.base),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.hairline),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.all(AppSpacing.base),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _isHovered ? AppColors.ink : AppColors.hairline,
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
+        ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,9 +116,9 @@ class _BookingCard extends StatelessWidget {
               // Listing image
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.sm),
-                child: booking.listingImageUrl != null
+                child: widget.booking.listingImageUrl != null
                     ? Image.network(
-                        booking.listingImageUrl!,
+                        widget.booking.listingImageUrl!,
                         width: 60,
                         height: 60,
                         fit: BoxFit.cover,
@@ -118,7 +144,7 @@ class _BookingCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      booking.listingTitle,
+                      widget.booking.listingTitle,
                       style: AppTypography.titleMd
                           .copyWith(color: AppColors.ink),
                       maxLines: 1,
@@ -126,7 +152,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      '${DateFmt.monthDay(booking.checkIn)} – ${DateFmt.monthDay(booking.checkOut)}',
+                      '${DateFmt.monthDay(widget.booking.checkIn)} – ${DateFmt.monthDay(widget.booking.checkOut)}',
                       style: AppTypography.bodySm
                           .copyWith(color: AppColors.muted),
                     ),
@@ -134,7 +160,7 @@ class _BookingCard extends StatelessWidget {
                 ),
               ),
               // Status badge
-              _StatusBadge(status: booking.status),
+              _StatusBadge(status: widget.booking.status),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -144,12 +170,12 @@ class _BookingCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${booking.nights} night${booking.nights > 1 ? 's' : ''} · ${booking.guests} guest${booking.guests > 1 ? 's' : ''}',
+                '${widget.booking.nights} night${widget.booking.nights > 1 ? 's' : ''} · ${widget.booking.guests} guest${widget.booking.guests > 1 ? 's' : ''}',
                 style:
                     AppTypography.bodySm.copyWith(color: AppColors.muted),
               ),
               Text(
-                PriceFormatter.formatDecimal(booking.totalAmount),
+                PriceFormatter.formatDecimal(widget.booking.totalAmount),
                 style: AppTypography.titleSm
                     .copyWith(color: AppColors.ink),
               ),
@@ -157,6 +183,7 @@ class _BookingCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

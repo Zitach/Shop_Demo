@@ -34,6 +34,91 @@ class SkeletonLoader extends StatelessWidget {
   }
 }
 
+class CategoryStripSkeleton extends StatelessWidget {
+  const CategoryStripSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 72,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
+        itemCount: 6,
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.lg),
+        itemBuilder: (_, __) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SkeletonLoader(
+              width: 28,
+              height: 28,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            const SkeletonLoader(width: 48, height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BookingListSkeleton extends StatelessWidget {
+  const BookingListSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppSpacing.base),
+      itemCount: 3,
+      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.base),
+      itemBuilder: (_, __) => Container(
+        padding: const EdgeInsets.all(AppSpacing.base),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.hairlineSoft),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                SkeletonLoader(
+                  width: 60,
+                  height: 60,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                const SizedBox(width: AppSpacing.base),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SkeletonLoader(width: 180, height: 16),
+                      const SizedBox(height: AppSpacing.xs),
+                      const SkeletonLoader(width: 120, height: 14),
+                    ],
+                  ),
+                ),
+                const SkeletonLoader(width: 72, height: 24),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            const Divider(color: AppColors.hairlineSoft, height: 1),
+            const SizedBox(height: AppSpacing.sm),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SkeletonLoader(width: 100, height: 14),
+                SkeletonLoader(width: 80, height: 16),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ListingGridSkeleton extends StatelessWidget {
   const ListingGridSkeleton({super.key});
 

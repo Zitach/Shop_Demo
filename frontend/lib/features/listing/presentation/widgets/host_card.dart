@@ -4,6 +4,7 @@ import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/features/listing/domain/listing_detail.dart';
+import 'package:shop_demo/l10n/app_localizations.dart';
 import 'package:shop_demo/shared/widgets/app_button.dart';
 
 class HostCard extends StatelessWidget {
@@ -13,6 +14,7 @@ class HostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,7 +31,7 @@ class HostCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hosted by ${host.name}',
+                    l10n.listingHosted(host.name),
                     style: AppTypography.displaySm.copyWith(color: AppColors.ink),
                   ),
                   if (host.isSuperhost) ...[
@@ -51,7 +53,7 @@ class HostCard extends StatelessWidget {
               const Icon(Icons.verified, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Superhost',
+                l10n.superhost,
                 style: AppTypography.bodyMd.copyWith(color: AppColors.ink),
               ),
             ],
@@ -73,7 +75,7 @@ class HostCard extends StatelessWidget {
         ],
         const SizedBox(height: AppSpacing.base),
         AppButton.secondary(
-          label: 'Contact host',
+          label: l10n.contactHost,
           icon: Icons.message_outlined,
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(

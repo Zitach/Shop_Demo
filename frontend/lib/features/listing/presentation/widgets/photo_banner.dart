@@ -16,6 +16,7 @@ class PhotoBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return PhotoCarousel(
       imageUrls: imageUrls,
+      heroTag: 'listing-image-$listingId',
       aspectRatio: 16 / 9,
       borderRadius: BorderRadius.zero,
       overlays: [

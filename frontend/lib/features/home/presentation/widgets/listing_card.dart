@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
+import 'package:shop_demo/app/theme/app_radius.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
 import 'package:shop_demo/core/utils/formatters.dart';
@@ -26,6 +27,7 @@ class ListingCardWidget extends ConsumerStatefulWidget {
 class _ListingCardWidgetState extends ConsumerState<ListingCardWidget>
     with SingleTickerProviderStateMixin {
   late final AnimationController _heartController;
+  bool _isHovered = false;
 
   @override
   void initState() {
@@ -56,13 +58,35 @@ class _ListingCardWidgetState extends ConsumerState<ListingCardWidget>
     final isFavorited =
         favoriteIds.valueOrNull?.contains(l.id) ?? false;
 
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Column(
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           PhotoCarousel(
             imageUrls: l.imageUrls,
+            heroTag: 'listing-image-${l.id}',
             aspectRatio: 1.0,
             overlays: [
               if (l.isGuestFavorite)
@@ -140,6 +164,8 @@ class _ListingCardWidgetState extends ConsumerState<ListingCardWidget>
           ),
         ],
       ),
+      ),
+    ),
     );
   }
 }
