@@ -49,6 +49,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final l10n = AppLocalizations.of(context)!;
     final categories = ref.watch(categoriesProvider);
     final listings = ref.watch(featuredListingsProvider);
+    final selectedCategoryId = ref.watch(selectedCategoryIdProvider);
 
     return Scaffold(
       floatingActionButton: _showScrollToTop
@@ -110,7 +111,18 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             SliverToBoxAdapter(
               child: categories.when(
-                data: (cats) => CategoryStrip(categories: cats),
+                data: (cats) => CategoryStrip(
+                  categories: cats,
+                  selectedId: selectedCategoryId,
+                  onSelected: (category) {
+                    final current = ref.read(selectedCategoryIdProvider);
+                    if (current == category.id) {
+                      ref.read(selectedCategoryIdProvider.notifier).state = null;
+                    } else {
+                      ref.read(selectedCategoryIdProvider.notifier).state = category.id;
+                    }
+                  },
+                ),
                 loading: () => const CategoryStripSkeleton(),
                 error: (e, _) => SizedBox(
                   height: 72,

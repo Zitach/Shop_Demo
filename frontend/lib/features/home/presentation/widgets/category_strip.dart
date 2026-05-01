@@ -8,7 +8,7 @@ import 'package:shop_demo/l10n/app_localizations.dart';
 
 class CategoryStrip extends StatefulWidget {
   final List<Category> categories;
-  final int? selectedId;
+  final String? selectedId;
   final ValueChanged<Category>? onSelected;
 
   const CategoryStrip({

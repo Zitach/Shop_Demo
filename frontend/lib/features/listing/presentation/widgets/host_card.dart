@@ -74,14 +74,13 @@ class HostCard extends StatelessWidget {
           ),
         ],
         const SizedBox(height: AppSpacing.base),
-        AppButton.secondary(
-          label: l10n.contactHost,
-          icon: Icons.message_outlined,
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Contact host feature coming soon')),
-            );
-          },
+        Opacity(
+          opacity: 0.5,
+          child: AppButton.secondary(
+            label: l10n.contactHost,
+            icon: Icons.message_outlined,
+            onTap: null,
+          ),
         ),
       ],
     );

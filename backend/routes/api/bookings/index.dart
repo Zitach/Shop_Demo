@@ -14,16 +14,11 @@ String? _getUserId(RequestContext context) {
   return context.read<AuthService>().verifyToken(token);
 }
 
+/// GET /api/bookings
+/// Get current user's bookings (auth required)
 /// POST /api/bookings
 /// Create a new booking (auth required)
 Future<Response> onRequest(RequestContext context) async {
-  if (context.request.method != HttpMethod.post) {
-    return Response.json(
-      statusCode: HttpStatus.methodNotAllowed,
-      body: {'error': {'code': 405, 'message': 'Method not allowed'}},
-    );
-  }
-
   final userId = _getUserId(context);
   if (userId == null) {
     return Response.json(
@@ -38,6 +33,37 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   final bookingService = context.read<BookingService>();
+
+  switch (context.request.method) {
+    case HttpMethod.get:
+      return _getBookings(bookingService, userId);
+    case HttpMethod.post:
+      return _createBooking(context, bookingService, userId);
+    default:
+      return Response.json(
+        statusCode: HttpStatus.methodNotAllowed,
+        body: {'error': {'code': 405, 'message': 'Method not allowed'}},
+      );
+  }
+}
+
+Future<Response> _getBookings(BookingService bookingService, String userId) async {
+  final bookings = await bookingService.getByUser(userId);
+
+  return Response.json(
+    statusCode: HttpStatus.ok,
+    body: {
+      'bookings': bookings.map(_bookingToJson).toList(),
+      'total': bookings.length,
+    },
+  );
+}
+
+Future<Response> _createBooking(
+  RequestContext context,
+  BookingService bookingService,
+  String userId,
+) async {
   final body = await context.request.json() as Map<String, dynamic>;
 
   final listingId = body['listingId'] as String?;

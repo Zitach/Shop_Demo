@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_radius.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
@@ -97,13 +98,7 @@ class _ReservationCardState extends State<ReservationCard> {
           AppButton.primary(
             label: l10n.reserve,
             onTap: _nights > 0
-                ? () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Booking feature coming soon'),
-                      ),
-                    );
-                  }
+                ? () => context.push('/booking/${widget.listingId}')
                 : null,
           ),
 

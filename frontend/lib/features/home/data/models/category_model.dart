@@ -10,7 +10,7 @@ class CategoryModel extends Category {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['id'] as int,
+      id: json['id'].toString(),
       name: json['name'] as String,
       iconUrl: json['iconUrl'] as String? ?? json['icon_url'] as String? ?? '',
       isNew: json['isNew'] as bool? ?? json['is_new'] as bool? ?? false,

@@ -29,11 +29,8 @@ Future<Response> onRequest(RequestContext context) async {
           .map((c) => {
                 'id': c.id,
                 'name': c.name,
-                'slug': c.slug,
                 'iconUrl': c.iconUrl,
-                'description': c.description,
-                'parentId': c.parentId,
-                'sortOrder': c.sortOrder,
+                'isNew': false,
               })
           .toList(),
     },

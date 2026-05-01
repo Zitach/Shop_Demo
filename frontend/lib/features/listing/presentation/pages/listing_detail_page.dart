@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shop_demo/app/theme/app_colors.dart';
 import 'package:shop_demo/app/theme/app_spacing.dart';
 import 'package:shop_demo/app/theme/app_typography.dart';
@@ -460,33 +461,7 @@ class _MobileBottomBar extends StatelessWidget {
             SizedBox(
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: AppColors.canvas,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
-                    builder: (ctx) => DraggableScrollableSheet(
-                      initialChildSize: 0.7,
-                      minChildSize: 0.5,
-                      maxChildSize: 0.95,
-                      expand: false,
-                      builder: (ctx, scrollController) => SingleChildScrollView(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: ReservationCard(
-                          pricePerNight: listing.pricePerNight,
-                          maxGuests: listing.maxGuests,
-                          listingId: listing.id,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                onPressed: () => context.push('/booking/${listing.id}'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,

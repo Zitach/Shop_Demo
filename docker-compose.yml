@@ -11,6 +11,41 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/lib/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - shop-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=shop_demo
+      - DB_USER=shop_user
+      - DB_PASSWORD=shop_password
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    networks:
+      - shop-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+    networks:
+      - shop-network
+
+networks:
+  shop-network:
+    driver: bridge
 
 volumes:
   pgdata:

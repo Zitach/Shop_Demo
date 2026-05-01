@@ -303,6 +303,23 @@ INSERT INTO reviews (id, listing_id, author_id, rating, title, comment) VALUES
     ('e0000000-0000-0000-0000-000000000002', 'd0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000003', 5, 'Perfect getaway', 'The cabin was cozy and the views were breathtaking. Highly recommend!'),
     ('e0000000-0000-0000-0000-000000000003', 'd0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000003', 5, 'Luxury at its best', 'The villa exceeded all expectations. Private pool and beach access were incredible.');
 
+-- Sample images for listings
+INSERT INTO images (id, listing_id, url, alt_text, sort_order, is_primary) VALUES
+    ('g0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000001', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', 'Modern Downtown Apartment living room', 1, TRUE),
+    ('g0000000-0000-0000-0000-000000000002', 'd0000000-0000-0000-0000-000000000001', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', 'Modern Downtown Apartment bedroom', 2, FALSE),
+    ('g0000000-0000-0000-0000-000000000003', 'd0000000-0000-0000-0000-000000000001', 'https://images.unsplash.com/photo-1484154218962-a1c002085d2f?w=800&q=80', 'Modern Downtown Apartment kitchen', 3, FALSE),
+    ('g0000000-0000-0000-0000-000000000004', 'd0000000-0000-0000-0000-000000000002', 'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80', 'Cozy Mountain Cabin exterior', 1, TRUE),
+    ('g0000000-0000-0000-0000-000000000005', 'd0000000-0000-0000-0000-000000000002', 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&q=80', 'Cozy Mountain Cabin interior', 2, FALSE),
+    ('g0000000-0000-0000-0000-000000000006', 'd0000000-0000-0000-0000-000000000002', 'https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=800&q=80', 'Cozy Mountain Cabin fireplace', 3, FALSE),
+    ('g0000000-0000-0000-0000-000000000007', 'd0000000-0000-0000-0000-000000000003', 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80', 'Beachfront Villa pool', 1, TRUE),
+    ('g0000000-0000-0000-0000-000000000008', 'd0000000-0000-0000-0000-000000000003', 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80', 'Beachfront Villa beach view', 2, FALSE),
+    ('g0000000-0000-0000-0000-000000000009', 'd0000000-0000-0000-0000-000000000003', 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80', 'Beachfront Villa bedroom', 3, FALSE),
+    ('g0000000-0000-0000-0000-000000000010', 'd0000000-0000-0000-0000-000000000004', 'https://images.unsplash.com/photo-1460317442991-0ec209397118?w=800&q=80', 'Historic Brownstone facade', 1, TRUE),
+    ('g0000000-0000-0000-0000-000000000011', 'd0000000-0000-0000-0000-000000000004', 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&q=80', 'Historic Brownstone living room', 2, FALSE),
+    ('g0000000-0000-0000-0000-000000000012', 'd0000000-0000-0000-0000-000000000005', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80', 'Loft in Arts District main space', 1, TRUE),
+    ('g0000000-0000-0000-0000-000000000013', 'd0000000-0000-0000-0000-000000000005', 'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&q=80', 'Loft in Arts District kitchen', 2, FALSE),
+    ('g0000000-0000-0000-0000-000000000014', 'd0000000-0000-0000-0000-000000000005', 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=80', 'Loft in Arts District bedroom', 3, FALSE);
+
 -- Sample booking
 INSERT INTO bookings (id, listing_id, guest_id, host_id, start_date, end_date, num_guests, total_price, status) VALUES
     ('f0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000002', '2026-05-01', '2026-05-05', 2, 600.00, 'confirmed');

@@ -201,27 +201,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 const SizedBox(height: AppSpacing.lg),
 
                 // Social login buttons
-                SocialLoginButton(
-                  label: 'Continue with Google',
-                  icon: Icons.g_mobiledata,
-                  iconColor: Colors.red,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Google login coming soon')),
-                    );
-                  },
+                const Opacity(
+                  opacity: 0.5,
+                  child: SocialLoginButton(
+                    label: 'Continue with Google (Coming soon)',
+                    icon: Icons.g_mobiledata,
+                    iconColor: Colors.red,
+                    onTap: null,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                SocialLoginButton(
-                  label: 'Continue with Apple',
-                  icon: Icons.apple,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Apple login coming soon')),
-                    );
-                  },
+                const Opacity(
+                  opacity: 0.5,
+                  child: SocialLoginButton(
+                    label: 'Continue with Apple (Coming soon)',
+                    icon: Icons.apple,
+                    onTap: null,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
 

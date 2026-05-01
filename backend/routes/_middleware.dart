@@ -17,7 +17,7 @@ final _userDao = UserDao(_database);
 final _listingDao = ListingDao(_database);
 final _bookingDao = BookingDao(_database);
 final _reviewDao = ReviewDao(_database);
-final _listingService = ListingService(listingDao: _listingDao, userDao: _userDao);
+final _listingService = ListingService(listingDao: _listingDao, userDao: _userDao, reviewDao: _reviewDao);
 final _searchService = SearchService(listingDao: _listingDao);
 final _bookingService = BookingService(bookingDao: _bookingDao, listingDao: _listingDao);
 

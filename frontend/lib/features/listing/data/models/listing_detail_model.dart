@@ -101,7 +101,7 @@ class ListingDetailModel extends ListingDetail {
     return raw.map((e) {
       final m = e as Map<String, dynamic>;
       return Amenity(
-        id: (m['id'] ?? 0) as int,
+        id: (m['id'] ?? '').toString(),
         name: (m['name'] ?? '') as String,
         iconKey: (m['iconKey'] ?? m['icon_key'] ?? '') as String,
       );

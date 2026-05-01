@@ -4,8 +4,9 @@ import 'package:shop_demo/features/home/domain/listing_card.dart';
 import 'package:shop_demo/features/profile/data/repositories/profile_repository_impl.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
   final localStorage = ref.watch(localStorageProvider);
-  return ProfileRepositoryImpl(localStorage);
+  return ProfileRepositoryImpl(apiClient, localStorage);
 });
 
 /// Provider for the set of favorite listing IDs.

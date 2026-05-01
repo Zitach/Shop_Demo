@@ -40,6 +40,7 @@ class BookingRepositoryImpl implements BookingRepository {
         'checkIn': checkIn.toIso8601String(),
         'checkOut': checkOut.toIso8601String(),
         'guests': guests,
+        'totalPrice': totalAmount,
       },
     );
 

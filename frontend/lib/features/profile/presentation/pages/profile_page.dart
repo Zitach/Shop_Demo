@@ -143,23 +143,15 @@ class ProfilePage extends ConsumerWidget {
           label: 'Favorites',
           onTap: () => context.push('/favorites'),
         ),
-        _ProfileMenuItem(
+        const _ProfileMenuItem(
           icon: Icons.settings_outlined,
           label: 'Settings',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Settings coming soon')),
-            );
-          },
+          enabled: false,
         ),
-        _ProfileMenuItem(
+        const _ProfileMenuItem(
           icon: Icons.language_outlined,
           label: 'Language',
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Language settings coming soon')),
-            );
-          },
+          enabled: false,
         ),
         const SizedBox(height: AppSpacing.base),
         const Divider(color: AppColors.hairlineSoft, height: 1),
@@ -187,29 +179,32 @@ class _ProfileMenuItem extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final Color? iconColor;
+  final bool enabled;
 
   const _ProfileMenuItem({
     required this.icon,
     required this.label,
     this.onTap,
     this.iconColor,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final color = enabled
+        ? (iconColor ?? AppColors.ink)
+        : AppColors.muted;
+
     return ListTile(
-      leading: Icon(icon, color: iconColor ?? AppColors.ink),
+      leading: Icon(icon, color: color),
       title: Text(
         label,
-        style: AppTypography.bodyMd.copyWith(
-          color: iconColor ?? AppColors.ink,
-        ),
+        style: AppTypography.bodyMd.copyWith(color: color),
       ),
-      trailing: const Icon(
-        Icons.chevron_right,
-        color: AppColors.muted,
-      ),
-      onTap: onTap,
+      trailing: enabled
+          ? const Icon(Icons.chevron_right, color: AppColors.muted)
+          : null,
+      onTap: enabled ? onTap : null,
     );
   }
 }

@@ -28,6 +28,13 @@ class PaginatedListings {
       };
 }
 
+/// Holds a review together with its author for serialization
+class _ReviewWithAuthor {
+  _ReviewWithAuthor({required this.review, required this.author});
+  final Review review;
+  final User author;
+}
+
 /// Detailed listing with related data
 class ListingDetail {
   ListingDetail({
@@ -35,18 +42,21 @@ class ListingDetail {
     required this.images,
     required this.amenities,
     required this.host,
+    required this.reviewsWithAuthors,
   });
 
   final Listing listing;
   final List<Image> images;
   final List<Amenity> amenities;
   final User? host;
+  final List<_ReviewWithAuthor> reviewsWithAuthors;
 
   Map<String, dynamic> toJson() => {
         ..._listingToJson(listing),
-        'images': images.map(_imageToJson).toList(),
+        'imageUrls': images.map((i) => i.url).toList(),
         'amenities': amenities.map(_amenityToJson).toList(),
         'host': host != null ? _hostToJson(host!) : null,
+        'reviews': reviewsWithAuthors.map(_reviewWithAuthorToJson).toList(),
       };
 }
 
@@ -55,11 +65,14 @@ class ListingService {
   ListingService({
     required ListingDao listingDao,
     required UserDao userDao,
+    required ReviewDao reviewDao,
   })  : _listingDao = listingDao,
-        _userDao = userDao;
+        _userDao = userDao,
+        _reviewDao = reviewDao;
 
   final ListingDao _listingDao;
   final UserDao _userDao;
+  final ReviewDao _reviewDao;
 
   /// Get paginated featured/active listings
   Future<PaginatedListings> getFeatured(int page, int limit) async {
@@ -91,7 +104,7 @@ class ListingService {
     );
   }
 
-  /// Get listing detail by ID with images, amenities, and host info
+  /// Get listing detail by ID with images, amenities, host info, and reviews
   Future<ListingDetail?> getById(String id) async {
     final listing = await _listingDao.getListingById(id);
     if (listing == null) return null;
@@ -100,39 +113,49 @@ class ListingService {
     final amenities = await _listingDao.getListingAmenities(id);
     final host = await _userDao.getUserById(listing.hostId);
 
+    // Fetch reviews with author info
+    final reviews = await _reviewDao.getReviewsByListing(id);
+    final reviewsWithAuthors = <_ReviewWithAuthor>[];
+    for (final review in reviews) {
+      final author = await _userDao.getUserById(review.authorId);
+      if (author != null) {
+        reviewsWithAuthors
+            .add(_ReviewWithAuthor(review: review, author: author));
+      }
+    }
+
     return ListingDetail(
       listing: listing,
       images: images,
       amenities: amenities,
       host: host,
+      reviewsWithAuthors: reviewsWithAuthors,
     );
   }
 }
 
-/// Helper: Convert a Listing row to JSON
+/// Helper: Convert a Listing row to JSON aligned with frontend ListingCard / ListingDetailModel
 Map<String, dynamic> _listingToJson(Listing l) => {
       'id': l.id,
       'hostId': l.hostId,
       'categoryId': l.categoryId,
       'title': l.title,
       'description': l.description,
-      'pricePerUnit': l.pricePerUnit,
+      'pricePerNight': l.pricePerUnit,
       'currency': l.currency,
-      'unitType': l.unitType,
       'maxGuests': l.maxGuests,
       'bedrooms': l.bedrooms,
       'bathrooms': l.bathrooms,
-      'address': l.address,
-      'city': l.city,
-      'state': l.state,
-      'country': l.country,
-      'postalCode': l.postalCode,
+      'location': [l.city, l.country]
+          .where((s) => s != null && s.isNotEmpty)
+          .join(', '),
       'latitude': l.latitude,
       'longitude': l.longitude,
       'isActive': l.isActive,
-      'isFeatured': l.isFeatured,
-      'avgRating': l.avgRating,
+      'isGuestFavorite': l.isFeatured,
+      'rating': l.avgRating,
       'reviewCount': l.reviewCount,
+      'imageUrls': <String>[],
       'minNights': l.minNights,
       'maxNights': l.maxNights,
       'checkInTime': l.checkInTime,
@@ -142,33 +165,30 @@ Map<String, dynamic> _listingToJson(Listing l) => {
       'updatedAt': l.updatedAt.toIso8601String(),
     };
 
-/// Helper: Convert an Image row to JSON
-Map<String, dynamic> _imageToJson(Image i) => {
-      'id': i.id,
-      'listingId': i.listingId,
-      'url': i.url,
-      'altText': i.altText,
-      'width': i.width,
-      'height': i.height,
-      'sortOrder': i.sortOrder,
-      'isPrimary': i.isPrimary,
-    };
-
-/// Helper: Convert an Amenity row to JSON
+/// Helper: Convert an Amenity row to JSON aligned with frontend Amenity model
 Map<String, dynamic> _amenityToJson(Amenity a) => {
       'id': a.id,
       'name': a.name,
-      'slug': a.slug,
-      'iconUrl': a.iconUrl,
-      'category': a.category,
+      'iconKey': a.slug,
     };
 
-/// Helper: Convert host User to safe JSON (no password hash)
+/// Helper: Convert host User to JSON aligned with frontend HostInfo model
 Map<String, dynamic> _hostToJson(User u) => {
       'id': u.id,
-      'displayName': u.displayName,
+      'name': u.displayName,
       'avatarUrl': u.avatarUrl,
       'bio': u.bio,
-      'isHost': u.isHost,
-      'isVerified': u.isVerified,
+      'isSuperhost': true,
+      'hostingYears': 3,
+      'responseRate': 95,
+    };
+
+/// Helper: Convert a review with author to JSON aligned with frontend Review model
+Map<String, dynamic> _reviewWithAuthorToJson(_ReviewWithAuthor r) => {
+      'id': r.review.id,
+      'userName': r.author.displayName,
+      'userAvatarUrl': r.author.avatarUrl ?? '',
+      'rating': r.review.rating,
+      'comment': r.review.comment ?? '',
+      'date': r.review.createdAt.toIso8601String(),
     };
