@@ -1,5 +1,7 @@
+import 'package:shop_demo/core/constants/app_constants.dart';
 import 'package:shop_demo/core/network/api_client.dart';
 import 'package:shop_demo/core/storage/local_storage.dart';
+import 'package:shop_demo/features/home/data/home_mock_data.dart';
 import 'package:shop_demo/features/home/data/models/listing_card_model.dart';
 import 'package:shop_demo/features/home/domain/listing_card.dart';
 
@@ -20,8 +22,29 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   bool get _isLoggedIn => _localStorage.isLoggedIn;
 
+  static const _mockFavoriteIds = {
+    'd0000000-0000-0000-0000-000000000001',
+    'd0000000-0000-0000-0000-000000000002',
+    'd0000000-0000-0000-0000-000000000003',
+  };
+
+  Set<String> _getStoredFavoriteIds() {
+    final raw = _localStorage.get<List>(_favoritesKey);
+    if (raw == null) return {};
+    return raw.map((e) => e.toString()).toSet();
+  }
+
   @override
   Future<List<ListingCard>> getFavorites() async {
+    if (AppConstants.useMockData) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      final ids = _getStoredFavoriteIds();
+      final allIds = ids.isEmpty ? _mockFavoriteIds : ids;
+      return HomeMockData.listings
+          .where((l) => allIds.contains(l.id))
+          .toList();
+    }
+
     if (_isLoggedIn) {
       try {
         final response = await _apiClient.dio.get('/api/user/favorites');
@@ -36,7 +59,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
       }
     }
 
-    // Fallback: local Hive storage
     final ids = await getFavoriteIds();
     if (ids.isEmpty) return [];
 
@@ -54,6 +76,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<void> toggleFavorite(String listingId) async {
+    if (AppConstants.useMockData) {
+      final ids = _getStoredFavoriteIds();
+      if (ids.contains(listingId)) {
+        ids.remove(listingId);
+      } else {
+        ids.add(listingId);
+      }
+      await _localStorage.set(_favoritesKey, ids.toList());
+      return;
+    }
+
     if (_isLoggedIn) {
       await _apiClient.dio.post(
         '/api/user/favorites',
@@ -62,7 +95,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return;
     }
 
-    // Fallback: local Hive storage
     final ids = await getFavoriteIds();
     if (ids.contains(listingId)) {
       ids.remove(listingId);
@@ -74,6 +106,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<bool> isFavorite(String listingId) async {
+    if (AppConstants.useMockData) {
+      final ids = _getStoredFavoriteIds();
+      final checkIds = ids.isEmpty ? _mockFavoriteIds : ids;
+      return checkIds.contains(listingId);
+    }
+
     if (_isLoggedIn) {
       try {
         final response = await _apiClient.dio.get('/api/user/favorites');
@@ -96,6 +134,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<Set<String>> getFavoriteIds() async {
+    if (AppConstants.useMockData) {
+      final ids = _getStoredFavoriteIds();
+      return ids.isEmpty ? _mockFavoriteIds : ids;
+    }
+
     if (_isLoggedIn) {
       try {
         final response = await _apiClient.dio.get('/api/user/favorites');
@@ -117,6 +160,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   Future<void> removeFavorite(String listingId) async {
+    if (AppConstants.useMockData) {
+      final ids = _getStoredFavoriteIds();
+      ids.remove(listingId);
+      await _localStorage.set(_favoritesKey, ids.toList());
+      return;
+    }
+
     if (_isLoggedIn) {
       await _apiClient.dio.delete('/api/user/favorites/$listingId');
       return;

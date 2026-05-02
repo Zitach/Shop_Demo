@@ -1,4 +1,6 @@
+import 'package:shop_demo/core/constants/app_constants.dart';
 import 'package:shop_demo/core/network/api_client.dart';
+import 'package:shop_demo/features/home/data/home_mock_data.dart';
 import 'package:shop_demo/features/home/data/models/category_model.dart';
 import 'package:shop_demo/features/home/data/models/listing_card_model.dart';
 import 'package:shop_demo/features/home/domain/category.dart';
@@ -16,6 +18,10 @@ class HomeRepositoryImpl implements HomeRepository {
 
   @override
   Future<List<Category>> getCategories() async {
+    if (AppConstants.useMockData) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return HomeMockData.categories;
+    }
     try {
       final response = await _apiClient.dio.get('/api/categories');
       final data = response.data;
@@ -33,6 +39,15 @@ class HomeRepositoryImpl implements HomeRepository {
 
   @override
   Future<List<ListingCard>> getFeaturedListings({String? category}) async {
+    if (AppConstants.useMockData) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      var listings = [...HomeMockData.listings];
+      if (category != null) {
+        // In mock mode, return all listings since we don't have per-category filtering.
+        // The UI categorization is handled by the search feature.
+      }
+      return listings;
+    }
     try {
       final response = await _apiClient.dio.get(
         '/api/listings',
